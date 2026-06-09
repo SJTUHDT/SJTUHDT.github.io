@@ -1,0 +1,11 @@
+{
+  "name": "personal-homepage-integrated-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "build": "node tools/build.mjs && node tools/export-static.mjs",
+    "build:routes": "node tools/build.mjs",
+    "export": "node tools/export-static.mjs"
+  }
+}

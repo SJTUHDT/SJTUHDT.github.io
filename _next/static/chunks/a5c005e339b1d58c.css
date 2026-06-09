@@ -1,0 +1,1 @@
+div:has(+.bg-project_visual-grid_wrapper){--padding-bottom:180px;padding-bottom:180px;padding-bottom:var(--padding-bottom)}@media (max-width:799.98px){div:has(+.bg-project_visual-grid_wrapper){padding-bottom:calc(var(--padding-bottom)/2)!important}}
