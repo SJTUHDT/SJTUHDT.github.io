@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact | New Personal Homepage</title>
+    <link rel="preload" href="../assets/transition-topography.png" as="image">
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem("personalHomePageTransition") === "incoming") {
+            document.documentElement.classList.add("page-transition-active", "page-transition-cold-cover");
+          }
+        } catch (error) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="../assets/site-data.js" defer></script>
+    <script src="../assets/app.js" defer></script>
+  </head>
+  <body class="contact-page" data-page="contact">
+    <header class="site-header">
+      <a class="brand" href="/en/" aria-label="New Personal Homepage home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span data-site-name>New Personal Homepage</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/en/profile/">Profile</a>
+        <a href="/en/journal/">Journal</a>
+        <a href="/en/gallery/">Gallery</a>
+        <a href="/en/contact/" aria-current="page">Contact</a>
+      </nav>
+    </header>
+
+    <main class="contact-shell" data-contact>
+      <img class="contact-bg" src="../assets/contact/contact-background.webp" alt="" aria-hidden="true" data-contact-bg>
+
+      <section class="contact-card">
+        <h1 data-contact-title>Contact Me</h1>
+
+        <div class="contact-card-left">
+          <div class="contact-channel contact-channel-email">
+            <span>Email</span>
+            <a href="#" data-contact-email>To be added</a>
+          </div>
+          <div class="contact-channel">
+            <span>Phone</span>
+            <a href="#" data-contact-phone>To be added</a>
+          </div>
+          <ul class="contact-locations" data-contact-locations>
+            <li>Availability</li>
+            <li>Location</li>
+          </ul>
+        </div>
+
+        <div class="contact-divider" aria-hidden="true"></div>
+
+        <div class="contact-card-right">
+          <div class="contact-channel contact-channel-address">
+            <span>Address</span>
+            <p data-contact-address>To be added</p>
+          </div>
+          <p class="contact-address-note" data-contact-address-note>Please message ahead for visits or deliveries. I will confirm the best time and entrance.</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
