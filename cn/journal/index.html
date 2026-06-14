@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>日志 | 氕氘氚</title>
+    <link rel="preload" href="../../assets/transition-topography.png" as="image">
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem("personalHomePageTransition") === "incoming") {
+            document.documentElement.classList.add("page-transition-active", "page-transition-cold-cover");
+          }
+        } catch (error) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <script src="../../assets/site-data.js" defer></script>
+    <script src="../../assets/journal-data.js" defer></script>
+    <script src="../../assets/app.js" defer></script>
+  </head>
+  <body class="journal-page" data-page="journal">
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="氕氘氚首页">
+        <span class="site-logo" data-site-logo aria-hidden="true"></span>
+        <span class="sr-only" data-site-name>氕氘氚</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="切换导航" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="../profile/">简历</a>
+        <a href="../journal/" aria-current="page">日志</a>
+        <a href="../gallery/">作品集</a>
+        <a href="../contact/">联系</a>
+      </nav>
+    </header>
+
+    <main class="journal-shell" data-journal>
+      <section class="journal-media" aria-hidden="true" data-journal-media-root></section>
+      <section class="journal-track" aria-label="日志条目">
+        <div class="journal-slides" data-journal-slides></div>
+      </section>
+      <div class="journal-controls" aria-hidden="true">
+        <span data-journal-current>01</span>
+        <span></span>
+        <span data-journal-total>00</span>
+      </div>
+    </main>
+  </body>
+</html>

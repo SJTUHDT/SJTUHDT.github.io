@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Journal Entry | H·D·T</title>
+    <link rel="preload" href="../../../assets/transition-topography.png" as="image">
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem("personalHomePageTransition") === "incoming") {
+            document.documentElement.classList.add("page-transition-active", "page-transition-cold-cover");
+          }
+        } catch (error) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../../../assets/styles.css">
+    <script src="../../../assets/site-data.js" defer></script>
+    <script src="../../../assets/journal-data.js" defer></script>
+    <script src="../../../assets/app.js" defer></script>
+  </head>
+  <body class="journal-detail-page" data-page="journalEntry">
+    <header class="site-header">
+      <a class="brand" href="../../" aria-label="H·D·T home">
+        <span class="site-logo" data-site-logo aria-hidden="true"></span>
+        <span class="sr-only" data-site-name>H·D·T</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="../../profile/">Profile</a>
+        <a href="../../journal/" aria-current="page">Journal</a>
+        <a href="../../gallery/">Gallery</a>
+        <a href="../../contact/">Contact</a>
+      </nav>
+    </header>
+
+    <main class="journal-detail" data-journal-detail>
+      <p class="journal-detail-fallback">Loading journal entry.</p>
+    </main>
+  </body>
+</html>

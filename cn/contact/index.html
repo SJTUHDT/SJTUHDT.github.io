@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>联系 | 氕氘氚</title>
+    <link rel="preload" href="../../assets/transition-topography.png" as="image">
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem("personalHomePageTransition") === "incoming") {
+            document.documentElement.classList.add("page-transition-active", "page-transition-cold-cover");
+          }
+        } catch (error) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <script src="../../assets/site-data.js" defer></script>
+    <script src="../../assets/app.js" defer></script>
+  </head>
+  <body class="contact-page" data-page="contact">
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="氕氘氚首页">
+        <span class="site-logo" data-site-logo aria-hidden="true"></span>
+        <span class="sr-only" data-site-name>氕氘氚</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="切换导航" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="../profile/">简历</a>
+        <a href="../journal/">日志</a>
+        <a href="../gallery/">作品集</a>
+        <a href="../contact/" aria-current="page">联系</a>
+      </nav>
+    </header>
+
+    <main class="contact-shell" data-contact>
+      <img class="contact-bg" src="../../assets/contact/contact-background.webp" alt="" aria-hidden="true" data-contact-bg>
+
+      <section class="contact-card">
+        <h1 data-contact-title>Contact Me</h1>
+        <p class="contact-description" data-contact-description>可以通过邮件联系我。</p>
+        <p class="contact-tagline" data-contact-tagline>这个页面保持简洁。</p>
+
+        <div class="contact-card-left">
+          <div class="contact-channel contact-channel-email">
+            <span>邮箱</span>
+            <a href="#" data-contact-email>待补充</a>
+          </div>
+          <div class="contact-channel">
+            <span>电话</span>
+            <a href="#" data-contact-phone>待补充</a>
+          </div>
+          <ul class="contact-locations" data-contact-locations>
+            <li>可用状态</li>
+            <li>位置</li>
+          </ul>
+        </div>
+
+        <div class="contact-divider" aria-hidden="true"></div>
+
+        <div class="contact-card-right">
+          <div class="contact-channel contact-channel-address">
+            <span>地址</span>
+            <p data-contact-address>待补充</p>
+          </div>
+          <p class="contact-address-note" data-contact-address-note>来访或寄送前请先留言，我会确认合适的时间与入口。</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -3,44 +3,134 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>中文页面建设中 | hdt.wiki</title>
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: #f6f1e8;
-        color: #191919;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      main {
-        width: min(520px, calc(100vw - 48px));
-      }
-
-      h1 {
-        margin: 0 0 16px;
-        font-size: 28px;
-        font-weight: 700;
-      }
-
-      p {
-        margin: 0 0 24px;
-        line-height: 1.7;
-      }
-
-      a {
-        color: inherit;
-        text-underline-offset: 4px;
-      }
-    </style>
+    <title>氕氘氚</title>
+    <link rel="preload" href="../assets/transition-topography.png" as="image">
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem("personalHomePageTransition") === "incoming") {
+            document.documentElement.classList.add("page-transition-active", "page-transition-cold-cover");
+          }
+        } catch (error) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="../assets/site-data.js"></script>
   </head>
-  <body>
-    <main>
-      <h1>中文页面建设中</h1>
-      <p>当前网站主版本已迁移到英文页面。中文内容会在后续整理后开放。</p>
-      <a href="/en/">进入英文主页</a>
+  <body class="home-page" data-page="home">
+    <main class="home-shell">
+      <aside class="home-sidebar" aria-label="首页导航">
+        <div class="home-brand">
+          <a class="brand site-logo-link home-logo-link" href="./" aria-label="氕氘氚首页">
+            <span class="site-logo" data-site-logo aria-hidden="true"></span>
+            <span class="sr-only" data-site-name>氕氘氚</span>
+          </a>
+        </div>
+
+        <nav class="home-nav" aria-label="主导航">
+          <a href="./" aria-current="page">
+            <span class="home-icon" aria-hidden="true">
+              <svg width="20" height="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 87.1 69.68">
+                <path d="m60.37 58.96-28.2 10.72 3.26-54.6-3.26-9.73L54.97 0h5.4zM87.1 5.36 65.33 0v58.96l8.78 1.38 12.99 9.34-.92-39.51zm-59.88 0L19.8 3.02 0 0l1.7 39.23L0 58.97l27.22 10.72-1.38-6.32 1.38-58Zm-7.89 29.27-6.14 10.54-4.43-9.15-3.64-13.87 3.26-4.25 5.07-1.84L19.94 19l2.75 4.76-3.35 10.87Z"></path>
+                <path d="M12.18 21.15 9.8 24.61l.76 4.55 4.66.98L18.25 27v-4.55l-3.36-1.84z"></path>
+              </svg>
+            </span>
+            <span class="home-nav-label">地图</span>
+          </a>
+          <a href="./profile/">
+            <span class="home-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 97.08 75.03" width="20" height="15">
+                <path d="M51.78 0 0 34.75v38.33l90.61 1.95 6.47-42.23zM6.59 44.23 1.3 43.09l18.91-13.81 24.21-16.83 3.1 2.69L13.21 39.7 6.6 44.22Zm45.96-23.12 4.68 3.38-16.73-.56 4.83-3.06 7.21.24ZM17.34 41.27l10.26-.22 49.86-.77-2 3.24-17.71-.49-22.64 1.32-21.33.16 3.57-3.24Zm25 15.54L4.62 54.92l-.83-3.91 20.62 1.75 17.72.5.2 3.55Zm-.31 7.92-37.84-.65-.4-2.5 31.27-1.41 7.45 1.76-.49 2.81Zm45.22 1.28-30.46-.65-.32-2.5 25.18-1.41 6 1.76-.4 2.81Zm-29.07-9.97-.36-3.75 14.28.87 12.32-.22 4.16 3.21-30.41-.12ZM85 39.42l-5.45-4.44-31.01-27.1 8.05 1.59 17.32 15.02 15.57 13.58L85 39.43Z"></path>
+              </svg>
+            </span>
+            <span class="home-nav-label">简历</span>
+          </a>
+          <a href="./journal/">
+            <span class="home-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56.67 93.1" width="20" height="26">
+                <path d="m44.53 30.36-4.05-17.94L33.73 0 14.84 19.32 0 34.5l14.84 26.22h25.64l10.79-9.66 5.4-31.74zm-9.64 23.73-3.08 2.58H20.25v-6.99l4.24-4.05 5.4-5.15 1.93 3.31 1.16 4.78 7.52-6.07-5.59 11.59Zm-1.18 24.84 22.96-12.75-9.7-1.42L27.59 76.1l-.78.37-21.45-7.66-1.31 3.84L20 79.75 4.05 87.43 8.2 93.1l18.59-10.33 23.2 10.33 2.63-3.84-7.88-6.39z"></path>
+              </svg>
+            </span>
+            <span class="home-nav-label">日志</span>
+          </a>
+          <a href="./gallery/">
+            <span class="home-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 82.52 70.73" width="20" height="16">
+                <path d="M64.98 5.66 37.13 0 12.38 8.49 0 20.75v13.2l10.32 7.55 13.41.94 1.15.15-7.19 20.77 9.36 7.37h20.8l5.2-7.37V47.57l-.94-1.43 7.72 1.01 22.69-4.71V18.86L64.99 5.66ZM18.13 30.83l-5.6-3.62 1.99-3.8 3.07-4.16h6.51l2.71 8.68-8.68 2.89Zm32.91-17.18-1.09 2.53-3.91-.59-2.05-3.38 3.25-1.09h3.8zm20.44 18.59-.09 1.81-4.84-.23-4.79-1.31 1.32-3.86 6.56-1.74 1.92 3.35-.09 1.99Z"></path>
+              </svg>
+            </span>
+            <span class="home-nav-label">作品集</span>
+          </a>
+          <a href="./contact/">
+            <span class="home-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 102.46 75.51" width="20" height="20">
+                <path d="m102.46 49.18-9.14-4.49-14.76-3.35 14.76-10.12 4.57-4.49-37.59 3.9L44.72 0 25.99 3.16H.39C-.03 8.78-.02 18.13.11 26.14L0 29.33l1.01 46.18 8.61-1.55-.81-37.14 39.21-2.36-4.22 24.25z"></path>
+              </svg>
+            </span>
+            <span class="home-nav-label">联系</span>
+          </a>
+        </nav>
+
+        <div class="home-meta">
+          <p class="home-language" data-home-language>EN / CN</p>
+          <p class="home-kicker" data-home-kicker>个人档案</p>
+          <h1 class="home-title" aria-label="A personal homepage for works, notes, and contact.">
+            <span class="home-title-layer home-title-base" aria-hidden="true" data-home-title-base>A personal homepage<br>for works, notes,<br>and contact.</span>
+            <span class="home-title-layer home-title-highlight" aria-hidden="true" data-home-title-highlight>A personal homepage<br>for works, notes,<br>and contact.</span>
+          </h1>
+          <p class="home-copyright" data-home-copyright>©2026</p>
+        </div>
+      </aside>
+
+      <section class="home-map-frame" aria-label="首页视觉框架">
+        <div class="map-frame-top" aria-hidden="true">
+          <span class="map-sun">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115.12 58.64">
+              <path d="M70.89 28.43v-.42l4.08.51.24-1.99-4.32-.54v-4.18l-2.22-5.86-7.18-2.22h-6.83l-4.27 3.23-2.06 1.9-1.36 4.1v3.08l-3.7.62.33 1.98 3.37-.57v.7l2.05 4.62 5.64 3.41h9.04l5.29-3.29zm-6.3-22.54L66.14 0l-2.01.02-2.18 10.84 1.81.15zM51.72 50.54l1.81.14.82-5.12 1.56-5.89-2.01.02zm24.84-35.01 5.27-3.07-1.44-1.4-9.21 6.12 1.18 1.38zM35.89 38l1.18 1.38 4.2-3.03 5.27-3.07-1.44-1.41zm36.82-7.28-.14 1.81 5.11.82 5.89 1.56-.02-2.01zM43.9 24.67l-.02-2.01-10.84-2.18-.14 1.81 5.11.83zm20.18 14.98 3.03 4.2 3.07 5.27 1.4-1.44-6.12-9.21zM49.36 13.83l1.41-1.44-6.13-9.21-1.38 1.18 3.04 4.2zM.001 57.38l3.145-3.887L4.7 54.751l-3.145 3.887zm5.658-7.002 3.144-3.888 1.555 1.258-3.144 3.888zm13.005-12.575 4.327-2.505 1.003 1.73-4.328 2.506zM13.36 40.87l-2.04 2.52 1.56 1.26 1.8-2.23 1.52-.88-1-1.73zM39.65 29.3l-.33-1.97-3.62.6-1.46.85 1 1.73 1.15-.66zm67.494 18.4 1.732-1.002 2.502 4.33-1.732 1zM26.447 33.302l4.327-2.505 1.002 1.73-4.327 2.506zm85.194 22.188 1.732-1 1.746 3.021-1.732 1zm-10.255-14.364 1.449-1.378 3.446 3.623-1.45 1.379zM95.85 33.82l-1.08 1.68 3.24 2.08.63.66 1.45-1.38-.71-.74zm-16.9-4.817.24-1.985 4.964.603-.241 1.985zm8.244 1.633 1.08-1.683 4.208 2.7-1.08 1.683z"></path>
+            </svg>
+          </span>
+          <span data-gmt-clock>--:--:-- GMT</span>
+          <span>EST. 2026</span>
+          <span class="map-compass">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+              <path d="M32 0 37.2 25.8 64 32 37.2 38.2 32 64 26.8 38.2 0 32 26.8 25.8zM32 20.7 29.8 30 20.7 32 29.8 34 32 43.3 34.2 34 43.3 32 34.2 30z"></path>
+            </svg>
+          </span>
+        </div>
+
+        <p class="map-side-label map-side-label-left" aria-hidden="true" data-home-side-left>
+          <span>Design &amp; development</span>
+          <span>Purveyors</span>
+        </p>
+        <p class="map-side-label map-side-label-right" aria-hidden="true" data-home-side-right>
+          <span>hand-crafted</span>
+          <span>digital design Refuge</span>
+        </p>
+
+        <section class="home-visual-panel" aria-label="首页视觉">
+          <img src="../assets/home-8831.webp" alt="首页照片">
+        </section>
+
+        <div class="map-frame-bottom" aria-hidden="true">
+          <div class="map-scale map-scale-left">
+            <span></span>
+            <p data-home-scale-left>72PX&nbsp;|&nbsp;54PT</p>
+          </div>
+          <p data-home-bottom-one>
+            <span>Gold idEAs</span>
+            <span>seekers</span>
+          </p>
+          <p data-home-bottom-two>
+            <span>Republic of</span>
+            <span>collaborative minds</span>
+          </p>
+          <div class="map-scale map-scale-right">
+            <span></span>
+            <p data-home-scale-right>16.1KM&nbsp;|&nbsp;10MI</p>
+          </div>
+        </div>
+      </section>
     </main>
+    <script src="../assets/app.js"></script>
   </body>
 </html>
