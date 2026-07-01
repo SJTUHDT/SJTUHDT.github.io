@@ -27,11 +27,13 @@
   --paper: #e7edf4;
   --display: "SanDisplay", Impact, "Arial Narrow Bold", sans-serif;
   --mono: "SanMono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --body-text: var(--mono);
 }
 
 html[lang="zh-CN"] {
   --display: "Pingxian Zhensong", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   --mono: "Pingxian Zhensong", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --body-text: "Pingxian Zhensong", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
 }
 
 * {
@@ -286,6 +288,7 @@ ul {
   display: grid;
   align-content: start;
   gap: 8px;
+  font-family: var(--body-text);
 }
 
 .profile-fields p {
@@ -324,7 +327,7 @@ ul {
 }
 
 html[lang="zh-CN"] .hero h1 {
-  font-size: clamp(58px, 8.4vw, 142px);
+  font-size: clamp(54px, 7.4vw, 124px);
   line-height: 1.08;
 }
 
@@ -332,8 +335,45 @@ html[lang="zh-CN"] .hero h1 {
   max-width: 390px;
   margin-top: 28px;
   color: rgba(22, 32, 42, .82);
+  font-family: var(--body-text);
   font-size: clamp(16px, 1.3vw, 22px);
-  line-height: 1.17;
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: 0;
+  font-variant-east-asian: proportional-width;
+  text-rendering: geometricPrecision;
+}
+
+html[lang="zh-CN"] .hero-copy > p:last-child {
+  max-width: 560px;
+}
+
+html[lang="en"] .hero-copy > p:last-child,
+html[lang="en"] .profile-fields,
+html[lang="en"] .about-copy,
+html[lang="en"] .body-copy {
+  font-family: "SanMono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+html[lang="en"] .hero-copy > p:last-child {
+  max-width: 560px;
+  font-size: clamp(15px, 1.1vw, 19px);
+  line-height: 1.22;
+}
+
+html[lang="en"] .profile-fields p {
+  font-size: 13px;
+  line-height: 1.16;
+  grid-template-columns: 82px minmax(0, 1fr);
+}
+
+html[lang="en"] .about-copy,
+html[lang="en"] .body-copy {
+  font-size: clamp(14px, 1.15vw, 20px);
+  line-height: 1.22;
 }
 
 .content-shell {
@@ -393,9 +433,13 @@ html[lang="zh-CN"] .hero h1 {
   grid-column: 6 / span 6;
   max-width: 620px;
   color: var(--icy);
-  font-family: var(--mono);
+  font-family: var(--body-text);
   font-size: clamp(15px, 1.1vw, 18px);
-  line-height: 1.32;
+  font-weight: 400;
+  line-height: 1.46;
+  letter-spacing: 0;
+  font-variant-east-asian: proportional-width;
+  text-rendering: geometricPrecision;
 }
 
 .about-copy p + p {
@@ -425,6 +469,7 @@ html[lang="zh-CN"] .hero h1 {
   max-width: 560px;
   color: var(--icy);
   font-size: clamp(15px, 1.1vw, 18px);
+  font-weight: 400;
   line-height: 1.2;
 }
 
@@ -458,6 +503,11 @@ html[lang="zh-CN"] .hero h1 {
   transform: translate3d(var(--x, 0), calc(var(--y, 0) + (1 - var(--active, 0)) * 54px), 0) rotate(var(--r, 0deg)) scale(calc(.84 + var(--active, 0) * .16));
   transition: opacity .16s linear, transform .16s linear;
   transform-origin: 50% 60%;
+  will-change: transform, opacity;
+}
+
+.gsap-enhanced .stack-photo {
+  transition: none;
 }
 
 .stack-placeholder {
@@ -609,6 +659,7 @@ html[lang="zh-CN"] .hero h1 {
   margin-top: 8px;
   color: #eef4fa;
   font-size: clamp(14px, 1.25vw, 20px);
+  font-weight: 400;
   line-height: 1.22;
   text-transform: uppercase;
 }
@@ -754,6 +805,12 @@ html[lang="zh-CN"] .hero h1 {
   transform: translateY(0);
 }
 
+.gsap-enhanced .reveal {
+  animation: none;
+  transition: none;
+  will-change: transform, opacity;
+}
+
 @supports (animation-timeline: view()) {
   .reveal {
     animation: reveal-scroll-content-y linear both;
@@ -773,6 +830,14 @@ html[lang="zh-CN"] .hero h1 {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  .gsap-enhanced .reveal,
+  .gsap-enhanced .body-copy.reveal,
+  .gsap-enhanced .service-item.reveal {
+    animation: none;
+    opacity: 0;
+    transform: translateY(34px);
   }
 }
 
@@ -932,6 +997,7 @@ html[lang="zh-CN"] .hero h1 {
   }
 
   .reveal {
+    animation: none !important;
     opacity: 1;
     transform: none;
   }

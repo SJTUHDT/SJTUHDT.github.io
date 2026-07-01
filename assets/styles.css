@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: "Pingxian Zhensong";
-  src: url("./fonts/pingxian-zhensong-subset.woff2") format("woff2");
+  src: url("./fonts/pingxian-zhensong.ttf") format("truetype");
   font-display: swap;
   font-weight: 400 900;
   font-style: normal;
@@ -127,6 +127,7 @@ body.home-page {
   --home-fog-opacity: 0.22;
   --home-fog-y: 0%;
   --home-fog-drift: 0px;
+  --home-scrim-opacity: 0;
   overflow: hidden;
   background: var(--home-bg);
   color: var(--home-ink);
@@ -497,6 +498,103 @@ html[lang="zh-CN"] .home-title {
   -webkit-user-drag: none;
 }
 
+.home-focus-scrim {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 18;
+  width: min(58vw, 740px);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 13% 80%, rgba(5, 10, 16, 0.82), transparent 54%),
+    linear-gradient(90deg, rgba(5, 10, 16, 0.72), rgba(5, 10, 16, 0.34) 50%, transparent);
+  opacity: var(--home-scrim-opacity);
+  transition: opacity 180ms linear;
+}
+
+.home-mode-hint {
+  position: fixed;
+  right: clamp(24px, 4vw, 60px);
+  bottom: clamp(22px, 4vw, 54px);
+  z-index: 32;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(41, 46, 51, 0.22);
+  border-radius: 50%;
+  background: rgba(221, 224, 228, 0.52);
+  color: var(--home-ink);
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  will-change: transform, opacity;
+}
+
+.home-mode-hint span {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  opacity: 0.82;
+  transform: rotate(45deg);
+}
+
+.home-mode-hint span:nth-child(1) {
+  margin-top: -9px;
+}
+
+.home-mode-hint span:nth-child(2) {
+  margin-top: 1px;
+  opacity: 0.52;
+}
+
+.home-mode-hint span:nth-child(3) {
+  width: 2px;
+  height: 19px;
+  margin-top: 9px;
+  border: 0;
+  background: currentColor;
+  opacity: 0.34;
+  transform: none;
+}
+
+body.home-image-fullscreen .home-mode-hint {
+  border-color: rgba(238, 244, 250, 0.22);
+  background: rgba(8, 18, 28, 0.5);
+  color: #eef4fa;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.42);
+}
+
+body.home-image-fullscreen .home-mode-hint span {
+  width: 4px;
+  height: 4px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.82;
+  transform: none;
+}
+
+body.home-image-fullscreen .home-mode-hint span:nth-child(1) {
+  transform: translate(-7px, -7px);
+}
+
+body.home-image-fullscreen .home-mode-hint span:nth-child(2) {
+  transform: translate(7px, 7px);
+}
+
+body.home-image-fullscreen .home-mode-hint span:nth-child(3) {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid currentColor;
+  opacity: 0.48;
+}
+
 .home-visual-panel::before,
 .home-visual-panel::after {
   position: absolute;
@@ -539,6 +637,22 @@ body.home-image-fullscreen .home-visual-panel {
 
 body.home-image-fullscreen.home-image-dragging .home-visual-panel {
   cursor: grabbing;
+}
+
+body.home-image-fullscreen .home-title-highlight,
+body.home-image-fullscreen .home-title-base,
+body.home-image-fullscreen .home-kicker,
+body.home-image-fullscreen .home-language,
+body.home-image-fullscreen .home-copyright {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.92),
+    0 2px 18px rgba(0, 0, 0, 0.58),
+    0 0 2px rgba(0, 0, 0, 0.82);
+}
+
+body.home-image-fullscreen .home-title-highlight,
+body.home-image-fullscreen .home-title-base {
+  -webkit-text-stroke: 0.7px rgba(5, 10, 16, 0.56);
 }
 
 .map-frame-top {
@@ -1015,6 +1129,11 @@ h2 {
 .journal-media-set.is-active {
   opacity: 1;
   transform: scale(1);
+}
+
+.gsap-enhanced .journal-media-set,
+.gsap-enhanced .journal-slides {
+  transition: none;
 }
 
 .journal-image-frame {
@@ -1515,16 +1634,19 @@ html[lang="zh-CN"] .journal-detail-header h1 {
 
 .gallery-aside {
   display: grid;
-  align-content: end;
+  grid-template-rows: minmax(140px, 1fr) auto;
+  align-content: stretch;
+  gap: 18px;
   height: 100vh;
-  padding: 120px 0 24px 24px;
+  padding: 118px 0 28px 24px;
   background: var(--gallery-deep);
   overflow: hidden;
 }
 
 .gallery-copy {
+  align-self: start;
   max-width: 218px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .gallery-copy p {
@@ -1536,30 +1658,40 @@ html[lang="zh-CN"] .journal-detail-header h1 {
 }
 
 .gallery-title-stack {
-  display: grid;
-  gap: 10px;
+  align-self: end;
+  display: block;
   width: calc(270px - 24px);
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow: visible;
 }
 
 .gallery-title-stack li {
+  display: block;
   color: var(--home-highlight);
   font-family: "F37 Stout", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   font-size: 120px;
   font-weight: 900;
-  line-height: 0.62;
+  line-height: 0.82;
+  background: linear-gradient(180deg, #d7ebff 0%, #8fa1b2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
   transform: scaleY(0.78);
   transform-origin: left center;
   text-transform: uppercase;
+  -webkit-text-fill-color: transparent;
+}
+
+.gallery-title-stack li + li {
+  margin-top: -18px;
 }
 
 .gallery-title-stack li:nth-child(1) { opacity: 1; }
-.gallery-title-stack li:nth-child(2) { opacity: 0.8; }
-.gallery-title-stack li:nth-child(3) { opacity: 0.6; }
-.gallery-title-stack li:nth-child(4) { opacity: 0.4; }
-.gallery-title-stack li:nth-child(5) { opacity: 0.2; }
+.gallery-title-stack li:nth-child(2) { opacity: 0.76; }
+.gallery-title-stack li:nth-child(3) { opacity: 0.54; }
+.gallery-title-stack li:nth-child(4) { opacity: 0.34; }
+.gallery-title-stack li:nth-child(5) { opacity: 0.18; }
 
 .gallery-loop {
   --gallery-gap: 24px;
@@ -1568,6 +1700,11 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   height: 100vh;
   padding: var(--gallery-gap);
   overflow: hidden;
+  opacity: 0;
+}
+
+.gallery-loop.is-ready {
+  opacity: 1;
 }
 
 .gallery-loop-column {
@@ -1580,6 +1717,7 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   display: flex;
   flex-direction: column;
   gap: var(--gallery-gap);
+  min-height: max-content;
   will-change: transform;
 }
 
@@ -1591,12 +1729,14 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   overflow: hidden;
   background: rgba(221, 224, 228, 0.08);
   clip-path: polygon(0 0, 90% 0, 100% 8%, 100% 100%, 0 100%);
+  contain: layout paint;
 }
 
 .gallery-loop-card img {
   display: block;
   width: 100%;
   height: 100%;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   opacity: 0.82;
   filter: contrast(0.96) saturate(0.88);
@@ -1608,6 +1748,11 @@ html[lang="zh-CN"] .journal-detail-header h1 {
 .gallery-loop-card:hover img {
   opacity: 1;
   transform: scale(1.025);
+}
+
+.gallery-loop:focus-within .gallery-loop-card img,
+.gallery-loop-card:hover img {
+  opacity: 1;
 }
 
 .contact-list {
@@ -1709,6 +1854,8 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   background: var(--home-bg);
   color: var(--home-ink);
   overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .contact-card h1 {
@@ -1790,6 +1937,9 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   border-bottom: 1px solid currentColor;
   color: var(--home-ink);
   text-transform: uppercase;
+  transition:
+    border-color 220ms ease,
+    transform 220ms ease;
 }
 
 .contact-channel-email {
@@ -1810,6 +1960,20 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   font-weight: 400;
   line-height: 1.45;
   text-decoration: underline;
+}
+
+.contact-channel:focus-within,
+.contact-channel:hover {
+  border-color: rgba(24, 61, 120, 0.78);
+  transform: translateY(-2px);
+}
+
+.contact-channel a:focus-visible,
+.journal-detail-back:focus-visible,
+.journal-detail-button:focus-visible,
+.journal-title-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
 }
 
 .contact-channel p {
@@ -2109,6 +2273,7 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   .gallery-aside {
     position: relative;
     z-index: 2;
+    display: block;
     height: auto;
     min-height: 34vh;
     padding: 92px 12px 12px;
@@ -2121,11 +2286,14 @@ html[lang="zh-CN"] .journal-detail-header h1 {
 
   .gallery-title-stack {
     width: 100%;
-    gap: 5px;
   }
 
   .gallery-title-stack li {
-    font-size: clamp(40px, 15vw, 72px);
+    font-size: clamp(46px, 15vw, 76px);
+  }
+
+  .gallery-title-stack li + li {
+    margin-top: -10px;
   }
 
   .gallery-loop {

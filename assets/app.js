@@ -34,6 +34,18 @@ const getAssetHref = value => {
   return match ? `${getSharedAssetBase()}${match[1]}` : path;
 };
 
+const hasGsap = () => typeof window.gsap === "object";
+const hasScrollTrigger = () => hasGsap() && typeof window.ScrollTrigger === "function";
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if (hasScrollTrigger()) {
+  window.gsap.registerPlugin(window.ScrollTrigger);
+}
+
+if (hasGsap()) {
+  document.documentElement.classList.add("gsap-enhanced");
+}
+
 const renderSiteLogos = () => {
   const logos = [...document.querySelectorAll("[data-site-logo]")].filter(logo => !logo.dataset.logoLoaded);
 
@@ -390,6 +402,8 @@ const saveJournalEntry = entry => {
   const slideTrack = journal.querySelector(".journal-slides");
   const currentLabel = journal.querySelector("[data-journal-current]");
   const trailTemplate = journal.querySelector(".journal-slide-trail");
+  const motionEnabled = hasGsap() && !prefersReducedMotion();
+  const activeTransition = { timeline: null, timer: 0 };
   let currentIndex = 0;
   let locked = false;
   let touchY = 0;
@@ -402,23 +416,104 @@ const saveJournalEntry = entry => {
     });
   }
 
-  const applyJournalIndex = index => {
+  const unlockJournal = () => {
+    locked = false;
+    window.clearTimeout(activeTransition.timer);
+  };
+
+  const applyJournalIndex = (index, instant = false) => {
+    if (!slides.length) {
+      return;
+    }
+
+    const previousIndex = currentIndex;
     currentIndex = Math.max(0, Math.min(index, slides.length - 1));
 
-    if (slideTrack) {
-      slideTrack.style.transform = `translate3d(0, ${-currentIndex * window.innerHeight}px, 0)`;
+    if (currentLabel) {
+      currentLabel.textContent = formatIndex(currentIndex);
     }
+
+    const previousMedia = mediaSets[previousIndex];
+    const nextMedia = mediaSets[currentIndex];
+    const activeSlide = slides[currentIndex];
+    const activeSlideParts = activeSlide
+      ? activeSlide.querySelectorAll(".journal-count, .journal-title-link, .journal-slide p, .journal-slide-trail")
+      : [];
 
     slides.forEach((slide, slideIndex) => {
       slide.classList.toggle("is-active", slideIndex === currentIndex);
     });
 
-    mediaSets.forEach((set, setIndex) => {
-      set.classList.toggle("is-active", setIndex === currentIndex);
+    if (!motionEnabled) {
+      if (slideTrack) {
+        slideTrack.style.transform = `translate3d(0, ${-currentIndex * window.innerHeight}px, 0)`;
+      }
+
+      mediaSets.forEach((set, setIndex) => {
+        set.classList.toggle("is-active", setIndex === currentIndex);
+      });
+      unlockJournal();
+      return;
+    }
+
+    if (activeTransition.timeline) {
+      activeTransition.timeline.kill();
+    }
+
+    if (nextMedia) {
+      nextMedia.classList.add("is-active");
+    }
+
+    activeTransition.timeline = window.gsap.timeline({
+      defaults: { ease: "power3.inOut", overwrite: "auto" },
+      onComplete: () => {
+        mediaSets.forEach((set, setIndex) => {
+          set.classList.toggle("is-active", setIndex === currentIndex);
+          if (setIndex !== currentIndex) {
+            window.gsap.set(set, { autoAlpha: 0, scale: 1.018 });
+          }
+        });
+        unlockJournal();
+      }
     });
 
-    if (currentLabel) {
-      currentLabel.textContent = formatIndex(currentIndex);
+    activeTransition.timeline.to(slideTrack, {
+      y: -currentIndex * window.innerHeight,
+      duration: instant ? 0 : 0.82
+    }, 0);
+
+    if (previousMedia && previousMedia !== nextMedia) {
+      activeTransition.timeline.to(previousMedia, {
+        autoAlpha: 0,
+        scale: 1.018,
+        duration: instant ? 0 : 0.58,
+        ease: "power2.out"
+      }, 0);
+    }
+
+    if (nextMedia) {
+      activeTransition.timeline.fromTo(nextMedia, {
+        autoAlpha: instant ? 1 : 0,
+        scale: instant ? 1 : 1.025
+      }, {
+        autoAlpha: 1,
+        scale: 1,
+        duration: instant ? 0 : 0.92,
+        ease: "power2.out"
+      }, instant ? 0 : 0.04);
+    }
+
+    if (!instant && previousIndex !== currentIndex && activeSlideParts.length) {
+      activeTransition.timeline.fromTo(activeSlideParts, {
+        autoAlpha: 0,
+        y: 26
+      }, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.62,
+        stagger: 0.045,
+        ease: "power3.out"
+      }, 0.18);
     }
   };
 
@@ -435,9 +530,8 @@ const saveJournalEntry = entry => {
 
     locked = true;
     applyJournalIndex(nextIndex);
-    window.setTimeout(() => {
-      locked = false;
-    }, 680);
+    window.clearTimeout(activeTransition.timer);
+    activeTransition.timer = window.setTimeout(unlockJournal, motionEnabled ? 980 : 680);
   };
 
   window.addEventListener("wheel", event => {
@@ -478,8 +572,8 @@ const saveJournalEntry = entry => {
     stepJournal(delta > 0 ? 1 : -1);
   }, { passive: false });
 
-  window.addEventListener("resize", () => applyJournalIndex(currentIndex));
-  applyJournalIndex(0);
+  window.addEventListener("resize", () => applyJournalIndex(currentIndex, true));
+  applyJournalIndex(0, true);
 })();
 
 (() => {
@@ -507,7 +601,7 @@ const saveJournalEntry = entry => {
           <div class="gallery-loop-track">
             ${repeatedItems.map((item, itemIndex) => `
               <figure class="gallery-loop-card">
-                <img src="${escapeHtml(getAssetHref(item.src))}" alt="${escapeHtml(item.alt || `Gallery image ${itemIndex + 1}`)}" loading="lazy">
+                <img src="${escapeHtml(getAssetHref(item.src))}" alt="${escapeHtml(item.alt || `Gallery image ${itemIndex + 1}`)}" loading="eager" decoding="async">
               </figure>
             `).join("")}
           </div>
@@ -525,7 +619,10 @@ const saveJournalEntry = entry => {
   const state = {
     velocity: 0,
     targetVelocity: 0,
-    friction: 0.82,
+    friction: 0.86,
+    paused: false,
+    hovered: false,
+    ready: false,
     positions: tracks.map((track, index) => (index % 2 === 0 ? 0 : -track.scrollHeight / 2))
   };
 
@@ -546,28 +643,50 @@ const saveJournalEntry = entry => {
     tracks.forEach((track, index) => {
       const halfHeight = track.scrollHeight / 2;
       state.positions[index] = index % 2 === 0 ? 0 : -halfHeight / 2;
-      track.style.transform = `translate3d(0, ${state.positions[index]}px, 0)`;
+      if (hasGsap()) {
+        window.gsap.set(track, { y: state.positions[index] });
+      } else {
+        track.style.transform = `translate3d(0, ${state.positions[index]}px, 0)`;
+      }
     });
   };
 
-  const animateColumns = () => {
+  const animateColumns = (deltaRatio = 1) => {
+    if (!state.ready || state.paused || document.hidden || prefersReducedMotion()) {
+      return;
+    }
+
     state.velocity += (state.targetVelocity - state.velocity) * 0.1;
     state.targetVelocity *= state.friction;
 
     tracks.forEach((track, index) => {
       const halfHeight = track.scrollHeight / 2;
       const direction = index % 2 === 0 ? 1 : -1;
-      const drift = 0.18 * direction;
+      const drift = (state.hovered ? 0.045 : 0.18) * direction * deltaRatio;
       const pushed = state.velocity * direction;
       state.positions[index] = wrapGalleryPosition(state.positions[index] + drift + pushed, halfHeight);
-      track.style.transform = `translate3d(0, ${state.positions[index].toFixed(2)}px, 0)`;
+      if (hasGsap()) {
+        window.gsap.set(track, { y: state.positions[index] });
+      } else {
+        track.style.transform = `translate3d(0, ${state.positions[index].toFixed(2)}px, 0)`;
+      }
     });
-
-    window.requestAnimationFrame(animateColumns);
   };
 
   const addVelocity = value => {
-    state.targetVelocity += value * 0.15;
+    state.targetVelocity += Math.max(-80, Math.min(80, value * 0.14));
+  };
+
+  const setGalleryHover = hovered => {
+    state.hovered = hovered;
+    if (hasGsap()) {
+      window.gsap.to(state, {
+        targetVelocity: hovered ? 0 : state.targetVelocity,
+        duration: 0.42,
+        ease: "power2.out",
+        overwrite: true
+      });
+    }
   };
 
   window.addEventListener("wheel", event => {
@@ -587,10 +706,84 @@ const saveJournalEntry = entry => {
     touchY = y;
   }, { passive: true });
 
-  window.addEventListener("resize", setInitialTrackPositions);
-  window.setTimeout(setInitialTrackPositions, 120);
+  gallery.addEventListener("pointerenter", () => setGalleryHover(true));
+  gallery.addEventListener("pointerleave", () => setGalleryHover(false));
+  gallery.addEventListener("focusin", () => setGalleryHover(true));
+  gallery.addEventListener("focusout", () => setGalleryHover(false));
+  document.addEventListener("visibilitychange", () => {
+    state.paused = document.hidden;
+  });
+  const waitForGalleryImages = () => {
+    const images = [...gallery.querySelectorAll(".gallery-loop-card img")];
+    const imagePromises = images.map(image => {
+      if (image.complete && image.naturalWidth > 0) {
+        return Promise.resolve();
+      }
+
+      if (typeof image.decode === "function") {
+        return image.decode().catch(() => {});
+      }
+
+      return new Promise(resolve => {
+        image.addEventListener("load", resolve, { once: true });
+        image.addEventListener("error", resolve, { once: true });
+      });
+    });
+
+    return Promise.race([
+      Promise.all(imagePromises),
+      new Promise(resolve => window.setTimeout(resolve, 1400))
+    ]);
+  };
+
+  const startGalleryMotion = () => {
+    setInitialTrackPositions();
+    state.ready = true;
+    loop?.classList.add("is-ready");
+
+    if (hasGsap()) {
+      window.gsap.fromTo(loop, { autoAlpha: 0 }, {
+        autoAlpha: 1,
+        duration: prefersReducedMotion() ? 0 : 0.42,
+        ease: "power2.out",
+        clearProps: "visibility"
+      });
+    }
+  };
+
+  window.addEventListener("resize", () => {
+    state.ready = false;
+    window.requestAnimationFrame(() => {
+      setInitialTrackPositions();
+      state.ready = true;
+    });
+  });
   setInitialTrackPositions();
-  animateColumns();
+
+  if (hasGsap()) {
+    window.gsap.fromTo(gallery.querySelectorAll(".gallery-copy, .gallery-title-stack"), {
+      autoAlpha: 0,
+      y: 34,
+      scale: 0.97
+    }, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      duration: prefersReducedMotion() ? 0 : 0.72,
+      stagger: 0.035,
+      ease: "power3.out",
+      clearProps: "visibility"
+    });
+    window.gsap.ticker.add(() => animateColumns(window.gsap.ticker.deltaRatio(60)));
+    waitForGalleryImages().then(startGalleryMotion);
+  } else {
+    const fallbackLoop = () => {
+      animateColumns(1);
+      window.requestAnimationFrame(fallbackLoop);
+    };
+    waitForGalleryImages().then(startGalleryMotion);
+    fallbackLoop();
+  }
 })();
 
 (() => {
@@ -691,6 +884,111 @@ const saveJournalEntry = entry => {
     document.title = `${updatedEntry.title}${siteConfig.titleSeparator || " | "}${siteConfig.pages?.journal?.title || "Journal"}`;
     setEditable(false);
   });
+
+  if (hasGsap()) {
+    const reduced = prefersReducedMotion();
+    const introTargets = detailRoot.querySelectorAll(".journal-detail-actions, .journal-detail-header > *, .journal-detail-media figure");
+    window.gsap.fromTo(introTargets, {
+      autoAlpha: 0,
+      y: 34,
+      scale: 0.985
+    }, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      duration: reduced ? 0 : 0.78,
+      stagger: 0.06,
+      ease: "power3.out",
+      clearProps: "visibility"
+    });
+
+    if (hasScrollTrigger() && !reduced) {
+      window.ScrollTrigger.batch(detailRoot.querySelectorAll(".journal-detail-body p"), {
+        start: "top 88%",
+        once: true,
+        onEnter: batch => window.gsap.fromTo(batch, {
+          autoAlpha: 0,
+          y: 22
+        }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.62,
+          stagger: 0.07,
+          ease: "power2.out",
+          clearProps: "visibility"
+        })
+      });
+
+      const refreshDetailMotion = () => window.ScrollTrigger.refresh();
+      detailRoot.querySelectorAll("img").forEach(image => {
+        if (image.complete) {
+          return;
+        }
+        image.addEventListener("load", refreshDetailMotion, { once: true });
+      });
+      document.fonts?.ready?.then(refreshDetailMotion);
+    }
+  }
+})();
+
+(() => {
+  const contact = document.querySelector("[data-contact]");
+
+  if (!contact || !hasGsap()) {
+    return;
+  }
+
+  const reduced = prefersReducedMotion();
+  const card = contact.querySelector(".contact-card");
+  const background = contact.querySelector(".contact-bg");
+  const channels = contact.querySelectorAll(".contact-channel, .contact-locations li, .contact-address-note");
+
+  window.gsap.fromTo([card, ...channels], {
+    autoAlpha: 0,
+    y: 30,
+    scale: 0.985
+  }, {
+    autoAlpha: 1,
+    y: 0,
+    scale: 1,
+    duration: reduced ? 0 : 0.76,
+    stagger: 0.045,
+    ease: "power3.out",
+    clearProps: "visibility"
+  });
+
+  if (reduced || !background || !card) {
+    return;
+  }
+
+  window.gsap.set(background, { scale: 1.04, transformOrigin: "center" });
+  window.gsap.set(card, { transformPerspective: 900, transformOrigin: "center" });
+
+  const bgX = window.gsap.quickTo(background, "x", { duration: 0.65, ease: "power3.out" });
+  const bgY = window.gsap.quickTo(background, "y", { duration: 0.65, ease: "power3.out" });
+  const rotateX = window.gsap.quickTo(card, "rotationX", { duration: 0.55, ease: "power3.out" });
+  const rotateY = window.gsap.quickTo(card, "rotationY", { duration: 0.55, ease: "power3.out" });
+  const cardY = window.gsap.quickTo(card, "y", { duration: 0.55, ease: "power3.out" });
+
+  contact.addEventListener("pointermove", event => {
+    const rect = contact.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / Math.max(1, rect.width) - 0.5;
+    const y = (event.clientY - rect.top) / Math.max(1, rect.height) - 0.5;
+
+    bgX(x * -22);
+    bgY(y * -18);
+    rotateX(y * -2.2);
+    rotateY(x * 2.8);
+    cardY(y * -5);
+  });
+
+  contact.addEventListener("pointerleave", () => {
+    bgX(0);
+    bgY(0);
+    rotateX(0);
+    rotateY(0);
+    cardY(0);
+  });
 })();
 
 if (isHomePage) {
@@ -698,6 +996,17 @@ if (isHomePage) {
   const visualPanel = document.querySelector(".home-visual-panel");
   const homeTitle = document.querySelector(".home-title");
   const homeLogo = document.querySelector(".home-logo-link .site-logo");
+  const hasGsap = typeof window.gsap === "object";
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const homeCopy = siteLocale === "cn"
+    ? {
+        enter: ["向上滚动进入影像", "进入后拖动查看细节，向下滚动返回"],
+        exit: ["拖动查看细节", "向下滚动或按 Esc 返回地图"]
+      }
+    : {
+        enter: ["Scroll up to enter image mode", "Then drag to inspect, scroll down to return"],
+        exit: ["Drag to inspect the image", "Scroll down or press Esc to return"]
+      };
   const visualState = {
     isDragging: false,
     lastX: 0,
@@ -717,9 +1026,57 @@ if (isHomePage) {
   let currentZoom = 0;
   let previousZoom = 0;
   let lastWheelAt = 0;
+  let zoomTween = null;
+  let currentHintMode = null;
+  const zoomState = { zoom: 0 };
+
+  const focusScrim = document.createElement("div");
+  focusScrim.className = "home-focus-scrim";
+  focusScrim.setAttribute("aria-hidden", "true");
+  document.body.appendChild(focusScrim);
+
+  const modeHint = document.createElement("div");
+  modeHint.className = "home-mode-hint";
+  modeHint.setAttribute("aria-hidden", "true");
+  document.body.appendChild(modeHint);
 
   const clampZoom = value => Math.max(0, Math.min(1, value));
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const writePan = () => {
+    rootStyle.setProperty("--home-pan-x", `${visualState.panX.toFixed(2)}px`);
+    rootStyle.setProperty("--home-pan-y", `${visualState.panY.toFixed(2)}px`);
+  };
+  const showModeHint = isFullscreen => {
+    if (currentHintMode === isFullscreen) {
+      return;
+    }
+
+    const copy = isFullscreen ? homeCopy.exit : homeCopy.enter;
+    currentHintMode = isFullscreen;
+
+    if (!modeHint.children.length) {
+      modeHint.innerHTML = "<span></span><span></span><span></span>";
+    }
+
+    modeHint.classList.toggle("is-fullscreen", isFullscreen);
+    modeHint.setAttribute("aria-label", `${copy[0]}. ${copy[1]}.`);
+
+    if (hasGsap && !reducedMotion) {
+      window.gsap.fromTo(modeHint, {
+        autoAlpha: 0,
+        y: isFullscreen ? 10 : -8
+      }, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.32,
+        ease: "power2.out",
+        overwrite: true
+      });
+    }
+  };
+
+  showModeHint(false);
+
   const updateHomeColorSplits = () => {
     if (!visualPanel) {
       return;
@@ -752,12 +1109,26 @@ if (isHomePage) {
     };
   };
 
-  const setVisualPan = (x, y, scale = visualState.scale) => {
+  const setVisualPan = (x, y, scale = visualState.scale, smooth = false) => {
     const bounds = panBounds(scale);
-    visualState.panX = clamp(x, -bounds.x, bounds.x);
-    visualState.panY = clamp(y, -bounds.y, bounds.y);
-    rootStyle.setProperty("--home-pan-x", `${visualState.panX}px`);
-    rootStyle.setProperty("--home-pan-y", `${visualState.panY}px`);
+    const nextX = clamp(x, -bounds.x, bounds.x);
+    const nextY = clamp(y, -bounds.y, bounds.y);
+
+    if (smooth && hasGsap && !reducedMotion) {
+      window.gsap.to(visualState, {
+        panX: nextX,
+        panY: nextY,
+        duration: 0.28,
+        ease: "power3.out",
+        overwrite: true,
+        onUpdate: writePan
+      });
+      return;
+    }
+
+    visualState.panX = nextX;
+    visualState.panY = nextY;
+    writePan();
   };
 
   const updateVisualTransform = zoom => {
@@ -798,6 +1169,7 @@ if (isHomePage) {
     rootStyle.setProperty("--frame-chrome-opacity", chromeOpacity.toFixed(4));
     rootStyle.setProperty("--home-sidebar-opacity", Math.max(0, 1 - zoom * 1.5).toFixed(4));
     rootStyle.setProperty("--home-sidebar-shift", `${-40 * zoom}px`);
+    rootStyle.setProperty("--home-scrim-opacity", Math.max(0, Math.min(0.86, zoom * 0.86)).toFixed(4));
 
     document.body.classList.toggle("home-image-fullscreen", zoom > 0.55);
     updateVisualTransform(zoom);
@@ -806,7 +1178,7 @@ if (isHomePage) {
     previousZoom = zoom;
   };
 
-  const animateHomeZoom = () => {
+  const animateHomeZoomFallback = () => {
     currentZoom += (targetZoom - currentZoom) * 0.13;
 
     if (Math.abs(targetZoom - currentZoom) < 0.001) {
@@ -814,11 +1186,54 @@ if (isHomePage) {
     }
 
     applyHomeZoom(currentZoom);
-    window.requestAnimationFrame(animateHomeZoom);
+    window.requestAnimationFrame(animateHomeZoomFallback);
   };
 
   const setHomeZoomTarget = zoom => {
-    targetZoom = clampZoom(zoom);
+    const nextTarget = clampZoom(zoom);
+
+    const sameTarget = Math.abs(nextTarget - targetZoom) < 0.001;
+
+    if (sameTarget && (zoomTween?.isActive?.() || Math.abs(currentZoom - nextTarget) < 0.001)) {
+      return;
+    }
+
+    targetZoom = nextTarget;
+    if (!sameTarget) {
+      showModeHint(targetZoom > 0.55);
+    }
+
+    if (reducedMotion) {
+      currentZoom = targetZoom;
+      zoomState.zoom = targetZoom;
+      applyHomeZoom(currentZoom);
+      return;
+    }
+
+    if (hasGsap) {
+      if (zoomTween) {
+        zoomTween.kill();
+      }
+
+      zoomTween = window.gsap.timeline({
+        defaults: { ease: "power3.inOut" },
+        onComplete: () => {
+          currentZoom = targetZoom;
+          zoomState.zoom = targetZoom;
+          applyHomeZoom(currentZoom);
+        }
+      });
+
+      zoomTween.to(zoomState, {
+        zoom: targetZoom,
+        duration: targetZoom > currentZoom ? 1.04 : 0.78,
+        onUpdate: () => {
+          currentZoom = zoomState.zoom;
+          applyHomeZoom(currentZoom);
+        }
+      }, 0);
+
+    }
   };
 
   window.addEventListener("wheel", event => {
@@ -838,9 +1253,20 @@ if (isHomePage) {
     setHomeZoomTarget(event.deltaY < 0 ? 1 : 0);
   }, { passive: false });
 
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape" && currentZoom > 0.55) {
+      setHomeZoomTarget(0);
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    applyHomeZoom(currentZoom);
+  });
+
   if (visualPanel) {
     visualPanel.addEventListener("pointerdown", event => {
       if (currentZoom <= 0.55) {
+        showModeHint(false);
         return;
       }
 
@@ -862,7 +1288,7 @@ if (isHomePage) {
       const nextY = visualState.panY + event.clientY - visualState.lastY;
       visualState.lastX = event.clientX;
       visualState.lastY = event.clientY;
-      setVisualPan(nextX, nextY);
+      setVisualPan(nextX, nextY, visualState.scale, true);
     });
 
     const stopDrag = event => {
@@ -881,5 +1307,9 @@ if (isHomePage) {
     visualPanel.addEventListener("pointercancel", stopDrag);
   }
 
-  animateHomeZoom();
+  applyHomeZoom(0);
+
+  if (!hasGsap && !reducedMotion) {
+    animateHomeZoomFallback();
+  }
 }
