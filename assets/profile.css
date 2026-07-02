@@ -875,15 +875,21 @@ html[lang="en"] .body-copy {
   }
 
   .personal-logo-link {
-    top: 22px;
-    left: 18px;
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: calc(24px + env(safe-area-inset-top, 0px)) 0 0 22px;
     width: 112px;
   }
 
   .hero-copy {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
     width: calc(100% - 48px);
     margin: 0 auto;
-    padding: 106px 0 28px;
+    padding: 48px 0 28px;
   }
 
   .eyebrow {
@@ -1021,16 +1027,45 @@ html[lang="en"] .body-copy {
   }
 
   .image-scroll {
-    min-height: 460px;
+    min-height: auto;
     margin-top: 34px;
   }
 
   .sticky-stack {
     position: relative;
     top: auto;
-    width: min(72vw, 330px);
-    height: min(88vw, 420px);
-    margin: 0 0 0 auto;
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    padding: 0 calc((100% - min(76vw, 330px)) / 2) 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-padding-inline: calc((100% - min(76vw, 330px)) / 2);
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .sticky-stack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stack-photo {
+    position: relative;
+    inset: auto;
+    flex: 0 0 min(76vw, 330px);
+    aspect-ratio: 4 / 5;
+    opacity: 1 !important;
+    transform: none !important;
+    scroll-snap-align: center;
+    transition: none;
+  }
+
+  .stack-placeholder {
+    height: 100%;
+    font-size: clamp(32px, 10vw, 54px);
   }
 
   .services-copy {

@@ -2401,8 +2401,7 @@ html[lang="zh-CN"] .journal-detail-header h1 {
   }
 
   .contact-page .nav-toggle {
-    border-color: rgba(41, 46, 51, 0.2);
-    background: rgba(221, 224, 228, 0.58);
+    display: none;
   }
 
   .journal-page .nav-toggle span,
