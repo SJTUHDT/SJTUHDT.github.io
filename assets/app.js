@@ -585,8 +585,10 @@ const saveJournalEntry = entry => {
 
   const loop = gallery.querySelector("[data-gallery-loop]");
   const items = siteConfig.gallery?.items || [];
-  const columnCount = window.matchMedia("(max-width: 860px)").matches ? 2 : 4;
+  const isMobileGallery = window.matchMedia("(max-width: 860px)").matches;
+  const columnCount = isMobileGallery ? 2 : 4;
   const columns = Array.from({ length: columnCount }, () => []);
+  const galleryTitle = siteConfig.gallery?.title || siteConfig.pages?.gallery?.title || "Gallery";
 
   items.forEach((item, index) => {
     columns[index % columnCount].push(item);
@@ -594,16 +596,35 @@ const saveJournalEntry = entry => {
 
   if (loop && items.length) {
     loop.innerHTML = columns.map((column, columnIndex) => {
-      const repeatedItems = [...column, ...column];
+      const mobileIntro = isMobileGallery && columnIndex === 0
+        ? `
+          <article class="gallery-mobile-intro-card">
+            <div class="gallery-mobile-intro-copy">
+              <p>${escapeHtml(siteConfig.gallery?.kicker || "")}</p>
+              <p>${escapeHtml(siteConfig.gallery?.intro || "")}</p>
+              <p>${escapeHtml(siteConfig.gallery?.note || "")}</p>
+            </div>
+            <ul class="gallery-mobile-title-stack" aria-label="${escapeHtml(galleryTitle)}">
+              <li>${escapeHtml(galleryTitle)}</li>
+              <li>${escapeHtml(galleryTitle)}</li>
+              <li>${escapeHtml(galleryTitle)}</li>
+              <li>${escapeHtml(galleryTitle)}</li>
+            </ul>
+          </article>
+        `
+        : "";
+      const itemMarkup = column.map((item, itemIndex) => `
+        <figure class="gallery-loop-card">
+          <img src="${escapeHtml(getAssetHref(item.src))}" alt="${escapeHtml(item.alt || `Gallery image ${itemIndex + 1}`)}" loading="eager" decoding="async">
+        </figure>
+      `);
+      const sequence = [mobileIntro, ...itemMarkup].filter(Boolean);
+      const repeatedSequence = isMobileGallery ? [...sequence, ...sequence] : [...itemMarkup, ...itemMarkup];
 
       return `
         <div class="gallery-loop-column" data-gallery-column="${columnIndex}">
           <div class="gallery-loop-track">
-            ${repeatedItems.map((item, itemIndex) => `
-              <figure class="gallery-loop-card">
-                <img src="${escapeHtml(getAssetHref(item.src))}" alt="${escapeHtml(item.alt || `Gallery image ${itemIndex + 1}`)}" loading="eager" decoding="async">
-              </figure>
-            `).join("")}
+            ${repeatedSequence.join("")}
           </div>
         </div>
       `;
@@ -998,6 +1019,7 @@ if (isHomePage) {
   const homeLogo = document.querySelector(".home-logo-link .site-logo");
   const hasGsap = typeof window.gsap === "object";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isMobileHome = () => window.matchMedia("(max-width: 860px)").matches;
   const homeCopy = siteLocale === "cn"
     ? {
         enter: ["向上滚动进入影像", "进入后拖动查看细节，向下滚动返回"],
@@ -1237,6 +1259,10 @@ if (isHomePage) {
   };
 
   window.addEventListener("wheel", event => {
+    if (isMobileHome()) {
+      return;
+    }
+
     const now = Date.now();
 
     if (now - lastWheelAt < 60) {

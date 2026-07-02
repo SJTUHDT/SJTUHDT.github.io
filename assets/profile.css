@@ -856,7 +856,103 @@ html[lang="en"] .body-copy {
 @media (max-width: 799px) {
   .content-shell {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding-inline: 16px;
+    padding-inline: 24px;
+  }
+
+  .hero {
+    align-content: start;
+    min-height: auto;
+    padding: 0 0 44px;
+  }
+
+  .hero::after {
+    height: 42%;
+  }
+
+  .hero-map {
+    inset: -12vh -18vw -6vh;
+    opacity: 0.34;
+  }
+
+  .personal-logo-link {
+    top: 22px;
+    left: 18px;
+    width: 112px;
+  }
+
+  .hero-copy {
+    width: calc(100% - 48px);
+    margin: 0 auto;
+    padding: 106px 0 28px;
+  }
+
+  .eyebrow {
+    max-width: 260px;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .hero h1 {
+    max-width: 330px;
+    margin-top: 14px;
+    font-size: clamp(52px, 17vw, 78px);
+    line-height: 1.04;
+  }
+
+  html[lang="zh-CN"] .hero h1 {
+    font-size: clamp(52px, 17vw, 80px);
+    line-height: 1.08;
+  }
+
+  .hero-copy > p:last-child,
+  html[lang="zh-CN"] .hero-copy > p:last-child {
+    max-width: 340px;
+    margin-top: 22px;
+    font-size: 16px;
+    line-height: 1.42;
+  }
+
+  .profile-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    grid-template-columns: 1fr;
+    width: calc(100% - 48px);
+    max-width: 360px;
+    margin: 4px auto 0;
+    gap: 14px;
+  }
+
+  .avatar-placeholder {
+    width: 128px;
+    font-size: 11px;
+  }
+
+  .profile-fields {
+    gap: 9px;
+  }
+
+  .profile-fields p {
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .about-section {
+    min-height: auto;
+    padding: 34px 0 22px;
+  }
+
+  .about-kicker {
+    font-size: clamp(48px, 17vw, 74px);
+  }
+
+  .about-copy {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.55;
   }
 
   .beginning {
@@ -876,32 +972,6 @@ html[lang="en"] .body-copy {
     grid-column: 1 / -1;
   }
 
-  .hero {
-    align-content: end;
-    min-height: auto;
-    padding: 0 0 28px;
-  }
-
-  .profile-card {
-    position: relative;
-    top: auto;
-    right: auto;
-    bottom: auto;
-    width: calc(100% - 32px);
-    margin: 0 auto;
-    grid-template-columns: 1fr;
-  }
-
-  .about-section {
-    min-height: auto;
-    padding: 26px 0 22px;
-  }
-
-  .about-copy {
-    margin-top: 18px;
-    font-size: 15px;
-  }
-
   .beginning-copy,
   .showreel-card {
     position: relative;
@@ -909,34 +979,62 @@ html[lang="en"] .body-copy {
     bottom: auto;
   }
 
+  .services {
+    gap: 34px;
+    padding-bottom: 82px;
+  }
+
+  .showreel-card {
+    height: auto;
+    min-height: 430px;
+  }
+
+  .board-mark strong {
+    font-size: clamp(48px, 16vw, 72px);
+  }
+
+  .board-note {
+    padding: 12px;
+  }
+
+  .board-note strong {
+    font-size: clamp(28px, 9vw, 42px);
+  }
+
+  .service-list {
+    gap: 34px;
+    margin-top: 34px;
+  }
+
+  .service-item {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .service-item h3 {
+    margin-bottom: 12px;
+  }
+
+  .service-item li {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
   .image-scroll {
-    min-height: 560px;
+    min-height: 460px;
     margin-top: 34px;
   }
 
   .sticky-stack {
     position: relative;
     top: auto;
-    width: min(76vw, 360px);
-    height: min(96vw, 450px);
+    width: min(72vw, 330px);
+    height: min(88vw, 420px);
     margin: 0 0 0 auto;
-  }
-
-  .services {
-    gap: 46px;
-  }
-
-  .showreel-card {
-    height: auto;
-    min-height: 560px;
   }
 
   .services-copy {
     display: block;
-  }
-
-  .service-list {
-    margin-top: 42px;
   }
 
   .skill-grid {
@@ -949,27 +1047,9 @@ html[lang="en"] .body-copy {
     font-size: clamp(54px, 18vw, 118px);
     transform: translate(-50%, 0);
   }
-
 }
 
 @media (max-width: 640px) {
-  .personal-logo-link {
-    width: 104px;
-  }
-
-  .hero-copy {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
-    width: calc(100% - 24px);
-    padding: 124px 0 36px;
-  }
-
-  .hero h1 {
-    font-size: clamp(62px, 20vw, 112px);
-  }
-
   .section-title {
     font-size: clamp(42px, 14vw, 72px);
   }
@@ -977,15 +1057,25 @@ html[lang="en"] .body-copy {
   .body-copy {
     font-size: 15px;
   }
+}
+
+@media (max-width: 430px) {
+  .hero-copy {
+    width: calc(100% - 44px);
+  }
+
+  .hero h1,
+  html[lang="zh-CN"] .hero h1 {
+    max-width: 320px;
+  }
 
   .profile-card {
-    grid-template-columns: 1fr;
+    width: calc(100% - 44px);
   }
 
-  .avatar-placeholder {
-    width: 132px;
+  .profile-fields p {
+    grid-template-columns: 64px minmax(0, 1fr);
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
